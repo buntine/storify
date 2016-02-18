@@ -13,16 +13,20 @@ api_key = sys.argv[1]
 path = sys.argv[2]
 page_size = 50
 
-def extract_elements(page=1, elements=[]):
+def extract_elements(page=1):
     conn = httplib.HTTPSConnection("api.storify.com")
-    conn.request("GET", "/v1/stories/%s?api_key=%s&per_page=%d" % (path, api_key, page_size))
+    conn.request("GET", "/v1/stories/%s?api_key=%s&per_page=%d&page=%d" % (path, api_key, page_size, page))
     resp = conn.getresponse()
     contents = json.loads(resp.read())
 
-    # Do req.
-    # pull out elements.
-    # (page * 50) < total_elements?
-      # return extract_elements(page + 1, elements)
-      # return elements 
+    total = contents['content']['totalElements']
+    elements = contents['content']['elements']
+
+    if (total > (page * page_size)):
+        return elements + extract_elements(page + 1)
+    else:
+        return elements
 
 elements = extract_elements()
+
+print len(elements)
