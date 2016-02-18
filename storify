@@ -6,15 +6,15 @@ import sys
 import os
 
 if len(sys.argv) < 3:
-    print "Usage: ./storify APIKEY PATH"
+    print "Usage: ./storify APIKEY PATH >> elements.json"
     exit(1)
 
 api_key = sys.argv[1]
 path = sys.argv[2]
 page_size = 50
+conn = httplib.HTTPSConnection("api.storify.com")
 
 def extract_elements(page=1):
-    conn = httplib.HTTPSConnection("api.storify.com")
     conn.request("GET", "/v1/stories/%s?api_key=%s&per_page=%d&page=%d" % (path, api_key, page_size, page))
     resp = conn.getresponse()
     contents = json.loads(resp.read())
@@ -29,4 +29,4 @@ def extract_elements(page=1):
 
 elements = extract_elements()
 
-print len(elements)
+print json.dumps(elements)
